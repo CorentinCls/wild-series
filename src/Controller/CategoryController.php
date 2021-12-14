@@ -5,6 +5,9 @@ namespace App\Controller;
 use App\Repository\CategoryRepository;
 use App\Repository\ProgramRepository;
 use App\Entity\Category;
+use Symfony\Component\HttpFoundation\Request;
+use App\Form\CategoryType;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -25,7 +28,37 @@ class CategoryController extends AbstractController
         ]);
     }
 
-      /**
+     /**
+     * The controller for the category add form
+     * @Route("/new", name="new")
+     */
+
+    public function new(Request $request, EntityManagerInterface $entityManager) : Response
+    {
+        // Create a new Category Object
+        $category = new Category();
+        // Create the associated Form
+        $form = $this->createForm(CategoryType::class, $category);
+
+        // Get data from HTTP request
+        $form->handleRequest($request);
+        // Was the form submitted ?
+        if ($form->isSubmitted()) {
+            // Persist Category Object
+            $entityManager->persist($category);
+            // Flush the persisted object
+            $entityManager->flush();
+            // Finally redirect to categories list
+            return $this->redirectToRoute('category_index');
+        }
+
+        // Render the form
+        return $this->render('program/new.html.twig', [
+            "form" => $form->createView(),
+        ]);
+    }
+
+    /**
      * @Route("/{categoryName}", methods={"GET"}, name="show")
      * @return Response
      */
