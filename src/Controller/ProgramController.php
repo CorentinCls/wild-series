@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use App\Form\ProgramType;
+use App\Service\Slugify;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
@@ -38,7 +39,7 @@ class ProgramController extends AbstractController
      * @Route("/new", name="new")
      */
 
-    public function new(Request $request, EntityManagerInterface $entityManager) : Response
+    public function new(Request $request, EntityManagerInterface $entityManager, Slugify $slugify) : Response
     {
         // Create a new Category Object
         $program = new Program();
@@ -49,6 +50,11 @@ class ProgramController extends AbstractController
         $form->handleRequest($request);
         // Was the form submitted ?
         if ($form->isSubmitted() && $form->isValid()) {
+
+            //Use slugify servive for clean url
+            $slug = $slugify->generate($program->getTitle());
+            $program->setSlug($slug);
+
             // Persist Category Object
             $entityManager->persist($program);
             // Flush the persisted object

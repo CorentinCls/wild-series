@@ -3,28 +3,27 @@
 {% block title %}All programs{% endblock %}
 
 {% block body %}
+    <a class="btn btn-primary fixed-bottom mb-5 w-25" href="{{ path('app_index') }}">
+        Retour à l'accueil
+    </a>
 
-    <h1>Toutes les séries de la table program : </h1>
+    <h1 class="text-center">Toutes les séries de la table program : </h1>
 
     {% for program in programs %}
-        <div>
-            {{ loop.index }} / {{ program.title }} 
+        <div class="border p-5 m-1 w-50 mx-auto text-center bg-danger">
+            <h1>{{ loop.index }} - {{ program.title }}</h1> 
                 {% if program.category is null %}
                     <p>Pas de catégorie</p>
                 {% else %}
-                <h2>Catégorie : {{ program.category.name }}</h2>
+                <h3>Catégorie : {{ program.category.name }}</h3>
                 {% endif %}
-                 
+                
             <p>{{ program.summary }}</p>
-            <a href="{{ path("program_show", { id: program.id }) }}">Voir la fiche</a>
+            <a class="btn btn-primary" href="{{ path("program_show", { id: program.id }) }}">Voir la fiche</a>
         </div>
     {% else %}
         Aucune série trouvée.
     {% endfor %}
-
-    <a href="{{ path('app_index') }}">
-        Retour à l'accueil
-    </a>
 
 {% endblock %}
 

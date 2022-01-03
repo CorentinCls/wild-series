@@ -51,8 +51,14 @@ class ProgramFixtures extends Fixture implements DependentFixtureInterface
             $program->setTitle($programData['title']);
             $program->setSummary($programData['summary']);
             $program->setPoster($programData['poster']);
-            $program->setCategory($this->getReference($programData['categoryReference']));
+
+            //Crée une référence avec le titre du programe
             $this->addReference('program_' . $programData['title'], $program);
+
+            //utilise la référence des catégories de l'entité category
+            $program->setCategory($this->getReference($programData['categoryReference']));
+
+            //utilise la référence de l'entité actor et l'ajoute uniquement sur le program the walking dead
             if (preg_match("/the walking dead/i", $programData['title'])) {
                 foreach (ActorFixtures::ACTORS as $i => $actorData) {
                     $program->addActor($this->getReference('actor_' . $i));

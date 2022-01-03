@@ -8,15 +8,15 @@
 
 
     {% for program in programs %}
-        <div>
+        <div class="border p-5 m-1 w-50 mx-auto">
+            <div class="d-flex flex-column">
+                <h2 class="text-center">{{ program.title }}</h2>
 
-            <h2>{{ program.title }}</h2>
+                <p class="text-justify">{{ program.summary }}</p>
 
-            <p>{{ program.summary }}</p>
-
-            {# Lien vers la fiche de la série #}
-            <a href="{{ path("program_show", { id: program.id }) }}" class="btn btn-primary">Voir la fiche</a>
-
+                {# Lien vers la fiche de la série #}
+                <a href="{{ path("program_show", { id: program.id }) }}" class="btn btn-primary">Voir la fiche</a>
+            </div>
         </div>
     {% else %}
         <p>Aucune série trouvée</p>
