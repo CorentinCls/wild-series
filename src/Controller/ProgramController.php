@@ -81,7 +81,7 @@ class ProgramController extends AbstractController
             // Flush the persisted object
             $entityManager->flush();
 
-            $email = (new Email())
+            $email = (new Email())  
                 ->from($this->getParameter('mailer_from'))
                 ->to('corentincls51@gmail.com')
                 ->subject('Une nouvelle série vient d\'être publiée !')
@@ -112,8 +112,8 @@ class ProgramController extends AbstractController
 
      /**
      * @Route("/{programId}/season/{seasonId}", requirements={"id"="\d+"}, methods={"GET"}, name="season_show")
-     * @ParamConverter("program", class="App\Entity\Program", options={"mapping": {"programId": "id"}})
-     * @ParamConverter("season", class="App\Entity\Season", options={"mapping": {"seasonId": "id"}})
+     * @ParamConverter("program", class="App\Entity\Program", options={"mapping": {"programId": "slug"}})
+     * @ParamConverter("season", class="App\Entity\Season", options={"mapping": {"seasonId": "slug"}})
      */
     public function showSeason(Program $program, Season $season, EpisodeRepository $episodeRepository): Response
     {
@@ -127,10 +127,10 @@ class ProgramController extends AbstractController
     }
 
     /**
-     * @Route("/{programId}/season/{seasonId}/episode/{episodeId}", requirements={"id"="\d+"}, methods={"GET"}, name="episode_show")
-     * @ParamConverter("program", class="App\Entity\Program", options={"mapping": {"programId": "id"}})
-     * @ParamConverter("season", class="App\Entity\Season", options={"mapping": {"seasonId": "id"}})
-     * @ParamConverter("episode", class="App\Entity\Episode", options={"mapping": {"episodeId": "id"}})
+     * @Route("/{programId}/season/{seasonId}/episode/{episodeId}", methods={"GET"}, name="episode_show")
+     * @ParamConverter("program", class="App\Entity\Program", options={"mapping": {"programId": "slug"}})
+     * @ParamConverter("season", class="App\Entity\Season", options={"mapping": {"seasonId": "slug"}})
+     * @ParamConverter("episode", class="App\Entity\Episode", options={"mapping": {"episodeId": "slug"}})
      */
     public function showEpisode(Program $program, Season $season, Episode $episode): Response
     {
@@ -145,7 +145,7 @@ class ProgramController extends AbstractController
     public function edit(
         Request $request,
         Program $program,
-        Season $season,
+        SeasonRepository $season,
         EntityManagerInterface $entityManager,
         Slugify $slugify
     ): Response 

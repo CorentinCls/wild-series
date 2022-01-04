@@ -5,10 +5,10 @@
 {% block body %}
 
     <h1>Liste des catégories : </h1>
+    <ul>
+        {% for category in categories %}
+                <li><a href=" {{ path("category_show", {slug: category.slug}) }}">{{category.name}}</a></li>
+        {% endfor %}
+    </ul>
 
-    {% for category in categories %}
-        <ul>
-            <li><a href=" {{ path("category_show", {categoryName: category.name})}}">{{category.name}}</a></li>
-        </ul>
-    {% endfor %}
 {% endblock %}

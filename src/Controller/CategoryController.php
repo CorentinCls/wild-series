@@ -7,6 +7,7 @@ use App\Repository\ProgramRepository;
 use App\Entity\Category;
 use Symfony\Component\HttpFoundation\Request;
 use App\Form\CategoryType;
+use App\Service\Slugify;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,7 +34,7 @@ class CategoryController extends AbstractController
      * @Route("/new", name="new")
      */
 
-    public function new(Request $request, EntityManagerInterface $entityManager) : Response
+    public function new(Request $request, EntityManagerInterface $entityManager, Slugify $slugify) : Response
     {
         // Create a new Category Object
         $category = new Category();
@@ -43,7 +44,12 @@ class CategoryController extends AbstractController
         // Get data from HTTP request
         $form->handleRequest($request);
         // Was the form submitted ?
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) 
+        {
+            // Slug
+            $slug = $slugify->generate($category->getName());
+            $category->setSlug($slug);
+
             // Persist Category Object
             $entityManager->persist($category);
             // Flush the persisted object
@@ -59,7 +65,7 @@ class CategoryController extends AbstractController
     }
 
     /**
-     * @Route("/{categoryName}", methods={"GET"}, name="show")
+     * @Route("/{slug}", methods={"GET"}, name="show")
      * @return Response
      */
     public function show(string $categoryName, ProgramRepository $programRepository, CategoryRepository $categoryRepository): Response
