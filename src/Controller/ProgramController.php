@@ -16,8 +16,11 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use App\Form\ProgramType;
+use App\Form\SearchProgramFormType;
 use App\Service\Slugify;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 
 /**
  * @Route("/program", name="program_")
@@ -27,11 +30,24 @@ class ProgramController extends AbstractController
     /**
      * @Route("/", name="index")
      */
-    public function index(ProgramRepository $programRepository): Response
+    public function index(ProgramRepository $programRepository, Request $request): Response
     {
-        $programs =  $programRepository->findAll();
+        $form = $this->createForm(SearchProgramFormType::class);
 
-        return $this->render('program/index.html.twig', ['programs' => $programs]);
+        // Get data from HTTP request
+        $form->handleRequest($request);
+        // Was the form submitted ?
+        if ($form->isSubmitted() && $form->isValid()) {
+            $search = $form->getData()['search'];
+            $programs = $programRepository->findLikeName($search);
+        } else {
+            $programs =  $programRepository->findAll();
+        }
+
+        return $this->render('program/index.html.twig',[
+            'programs' => $programs,
+            'form' => $form->createView()
+        ]);
     }
 
     /**
@@ -39,7 +55,12 @@ class ProgramController extends AbstractController
      * @Route("/new", name="new")
      */
 
-    public function new(Request $request, EntityManagerInterface $entityManager, Slugify $slugify) : Response
+    public function new(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        Slugify $slugify,
+        MailerInterface $mailer
+        ) : Response
     {
         // Create a new Category Object
         $program = new Program();
@@ -59,6 +80,15 @@ class ProgramController extends AbstractController
             $entityManager->persist($program);
             // Flush the persisted object
             $entityManager->flush();
+
+            $email = (new Email())
+                ->from($this->getParameter('mailer_from'))
+                ->to('corentincls51@gmail.com')
+                ->subject('Une nouvelle série vient d\'être publiée !')
+                ->html($this->renderView('Program/newProgramEmail.html.twig', ['program' => $program]));
+
+            $mailer->send($email);
+
             // Finally redirect to categories list
             return $this->redirectToRoute('program_index');
         }
@@ -108,6 +138,36 @@ class ProgramController extends AbstractController
             'program' => $program,
             'season' => $season,
             'episode' => $episode,
+        ]);
+    }
+
+    #[Route('/{slug}/edit', name: 'edit', methods: ['GET', 'POST'])]
+    public function edit(
+        Request $request,
+        Program $program,
+        Season $season,
+        EntityManagerInterface $entityManager,
+        Slugify $slugify
+    ): Response 
+    {
+        $form = $this->createForm(ProgramType::class, $program);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            // Slug
+            $slug = $slugify->generate($program->getTitle());
+            $program->setSlug($slug);
+
+            $entityManager->flush();
+
+            return $this->redirectToRoute('program_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->renderForm('program/edit.html.twig', [
+            'program' => $program,
+            'season' => $season,
+            'form' => $form,
         ]);
     }
 }

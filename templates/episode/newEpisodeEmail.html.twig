@@ -1,0 +1,7 @@
+{% extends "_mail.html.twig" %}
+
+{% block body %}
+    <h1>New program {{ episode.title }} created</h1>
+    <p>Hello, the new program {{ episode.number }} has been created on Wild Series</p>
+    <p>Summary : {{episode.synopsis }} </p>
+{% endblock %}

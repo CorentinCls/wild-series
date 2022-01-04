@@ -8,6 +8,11 @@
     </a>
 
     <h1 class="text-center">Toutes les séries de la table program : </h1>
+    
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button>Search</button>
+    {{ form_end(form) }}
 
     {% for program in programs %}
         <div class="border p-5 m-1 w-50 mx-auto text-center bg-danger">
